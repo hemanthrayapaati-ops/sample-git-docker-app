@@ -1,14 +1,18 @@
 pipeline:
-  build:
-    image: node:18
-    commands:
-      - echo "🚀 Running build pipeline"
-      - node --version
-      - echo "✅ Build complete!"
-
-  docker:
+  build_and_push:
     image: docker:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - echo "🐳 Simulating Docker build..."
-      - sleep 3
-      - echo "✅ Docker build complete!"
+      - docker build --no-cache -t hemanthr2002/sample-app:latest .
+      - echo "$${DOCKER_PASSWORD}" | docker login -u "$${DOCKER_USERNAME}" --password-stdin
+      - docker push hemanthr2002/sample-app:latest
+
+  redeploy:
+    image: docker:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    commands:
+      - docker pull hemanthr2002/sample-app:latest
+      - docker rm -f sample-app || true
+      - docker run -d -p 8080:80 --name sample-app hemanthr2002/sample-app:latest
