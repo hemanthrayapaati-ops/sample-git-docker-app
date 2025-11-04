@@ -1,0 +1,7 @@
+pipeline:
+  build:
+    image: docker:latest
+    commands:
+      - docker build -t hemanthr2002/sample-app:latest .
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - docker push hemanthr2002/sample-app:latest
