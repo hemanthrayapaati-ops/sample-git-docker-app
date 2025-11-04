@@ -1,9 +1,10 @@
-pipeline:
+steps:
   build_and_push:
     image: docker:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
+      - echo "🚀 Building Docker image..."
       - docker build --no-cache -t hemanthr2002/sample-app:latest .
       - echo "$${DOCKER_PASSWORD}" | docker login -u "$${DOCKER_USERNAME}" --password-stdin
       - docker push hemanthr2002/sample-app:latest
@@ -13,9 +14,7 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-      - echo "Pulling latest image..."
+      - echo "🔄 Redeploying latest Docker image..."
       - docker pull hemanthr2002/sample-app:latest
-      - echo "Removing old container (if exists)..."
       - docker rm -f sample-app || true
-      - echo "Starting new container..."
       - docker run -d -p 8080:80 --name sample-app hemanthr2002/sample-app:latest
