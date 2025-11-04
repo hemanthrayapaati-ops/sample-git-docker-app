@@ -13,6 +13,9 @@ pipeline:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     commands:
+      - echo "Pulling latest image..."
       - docker pull hemanthr2002/sample-app:latest
+      - echo "Removing old container (if exists)..."
       - docker rm -f sample-app || true
+      - echo "Starting new container..."
       - docker run -d -p 8080:80 --name sample-app hemanthr2002/sample-app:latest
