@@ -1,20 +1,24 @@
+---
+# ✅ Define pipeline steps (modern syntax)
 steps:
   build_and_push:
     image: docker:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true            # ✅ allows Docker-in-Docker, avoids "insufficient privileges"
     commands:
       - echo "🚀 Building Docker image..."
       - docker build --no-cache -t hemanthr2002/sample-app:latest .
       - echo "$${DOCKER_PASSWORD}" | docker login -u "$${DOCKER_USERNAME}" --password-stdin
       - docker push hemanthr2002/sample-app:latest
+    when:
+      event: [push, manual]     # ✅ fixes "Please set an event filter" warning
 
   redeploy:
     image: docker:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true            # ✅ same fix for this step
     commands:
       - echo "🔄 Redeploying latest Docker image..."
       - docker pull hemanthr2002/sample-app:latest
       - docker rm -f sample-app || true
       - docker run -d -p 8080:80 --name sample-app hemanthr2002/sample-app:latest
+    when:
+      event: [push, manual]     # ✅ ensures step runs only on push or manual trigger
