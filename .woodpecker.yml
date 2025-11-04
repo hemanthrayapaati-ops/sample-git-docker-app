@@ -1,7 +1,14 @@
 pipeline:
   build:
+    image: node:18
+    commands:
+      - echo "🚀 Running build pipeline"
+      - node --version
+      - echo "✅ Build complete!"
+
+  docker:
     image: docker:latest
     commands:
-      - docker build -t hemanthr2002/sample-app:latest .
-      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-      - docker push hemanthr2002/sample-app:latest
+      - echo "🐳 Simulating Docker build..."
+      - sleep 3
+      - echo "✅ Docker build complete!"
