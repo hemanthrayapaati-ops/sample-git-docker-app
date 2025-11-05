@@ -1,16 +1,17 @@
-# .woodpecker.yml
-pipeline:
+steps:
   build_and_push:
-    image: docker:24-dind
+    image: docker:24.0
     environment:
-      - DOCKER_HOST=tcp://host.docker.internal:2375
-      - DOCKER_BUILDKIT=1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      DOCKER_HOST: tcp://host.docker.internal:2375
+    secrets:
+      - DOCKER_USERNAME
+      - DOCKER_PASSWORD
     commands:
       - echo "🚀 Building Docker image..."
-      - docker build -t hemanthr2002/sample-app:latest .
+      - docker build -t hemanthr2002/sample-app:${CI_COMMIT_SHA:0:7} .
       - echo "🔐 Logging into Docker Hub..."
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - echo "📤 Pushing image to Docker Hub..."
+      - docker push hemanthr2002/sample-app:${CI_COMMIT_SHA:0:7}
+      - docker tag hemanthr2002/sample-app:${CI_COMMIT_SHA:0:7} hemanthr2002/sample-app:latest
       - docker push hemanthr2002/sample-app:latest
